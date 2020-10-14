@@ -2001,11 +2001,18 @@ function parseConstantExpr($parse, context, name, expression, fallback) {
 }
 
 function checkboxInputType(scope, element, attr, ctrl, $sniffer, $browser, $filter, $parse) {
+  var isIE11 = !!window.MSInputMethodContext && !!window.document.documentMode;
   var trueValue = parseConstantExpr($parse, scope, 'ngTrueValue', attr.ngTrueValue, true);
   var falseValue = parseConstantExpr($parse, scope, 'ngFalseValue', attr.ngFalseValue, false);
 
   var listener = function(ev) {
-    ctrl.$setViewValue(element[0].checked, ev && ev.type);
+    if (isIE11) {
+      setTimeout(function() {
+        ctrl.$setViewValue(element[0].checked, ev && ev.type);
+      });
+    } else {
+      ctrl.$setViewValue(element[0].checked, ev && ev.type);
+    }
   };
 
   element.on('change', listener);
